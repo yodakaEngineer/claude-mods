@@ -37,3 +37,7 @@ claude plugin test <mod>
 ```
 
 Or run a session with a mod loaded from this folder: `claude --plugin-dir ./pr-status-pane`.
+
+## License
+
+MIT

@@ -1,8 +1,17 @@
 {
   "name": "yodaka-mods",
-  "owner": { "name": "yodaka" },
+  "owner": {
+    "name": "yodaka"
+  },
   "plugins": [
-    { "name": "pr-status-pane", "source": "./pr-status-pane" },
-    { "name": "progress-band", "source": "./progress-band" }
-  ]
+    {
+      "name": "pr-status-pane",
+      "source": "./pr-status-pane"
+    },
+    {
+      "name": "progress-band",
+      "source": "./progress-band"
+    }
+  ],
+  "description": "Mods for Claude Code: a PR/CI status pane and a Haiku-written progress band"
 }
