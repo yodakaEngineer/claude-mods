@@ -1,0 +1,21 @@
+{
+  "name": "progress-band",
+  "version": "0.1.0",
+  "description": "経過時間と、Haikuが差分から更新する進捗サマリ（計画・済・今・次・進捗率・確認事項）をプロンプト上に表示する",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "view": {
+      "type": "string",
+      "title": "View",
+      "description": "Where the progress summary is drawn: a band above the prompt, or a pane (docked beside the transcript in fullscreen).",
+      "default": "band",
+      "options": [
+        "band",
+        "pane"
+      ]
+    }
+  },
+  "author": {
+    "name": "yodaka"
+  }
+}

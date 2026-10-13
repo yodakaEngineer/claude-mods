@@ -1,0 +1,9 @@
+{
+  "name": "pr-status-pane",
+  "version": "0.1.0",
+  "description": "Shows the current branch's PR and CI check status in a pane and notifies when checks finish",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "yodaka"
+  }
+}

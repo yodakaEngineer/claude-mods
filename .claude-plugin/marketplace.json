@@ -1,0 +1,8 @@
+{
+  "name": "yodaka-mods",
+  "owner": { "name": "yodaka" },
+  "plugins": [
+    { "name": "pr-status-pane", "source": "./pr-status-pane" },
+    { "name": "progress-band", "source": "./progress-band" }
+  ]
+}
