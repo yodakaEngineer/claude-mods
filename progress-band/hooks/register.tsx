@@ -36,7 +36,7 @@ const SYSTEM = `あなたはコーディングセッションの進捗を追跡�
 前回のサマリを土台に、新しいやり取りで変わった点だけ反映して更新してください。
 変化がない項目は前回の文をそのまま使ってください。
 
-出力は次のJSONのみ。説明文やコードフェンスは不要。各文は日本語で簡潔に（各40字以内、asks の各要素も40字以内）。
+出力は次のJSONのみ。説明文やコードフェンスは不要。各文は簡潔に（各40字以内、asks の各要素も40字以内）。文の言語は、ユーザーメッセージ末尾の「出力言語」指示に従うこと。
 {
   "plan": "ユーザーの依頼と全体の計画を1文で",
   "done": "ここまでに完了したこと",
@@ -141,6 +141,7 @@ function parseSummary(text: string, updatedAt: number): ProgressSummary | null {
 }
 
 let isRefreshing = false
+let languageOnce: 'en' | 'ja' | null = null
 let isTurnRunning = false
 let isWanted = false
 let lastRefreshAt = 0
@@ -181,9 +182,12 @@ async function refresh($: EngineInterface): Promise<void> {
     const previous = await read($, summary)
     await update($, isBusy, () => true)
 
+    const language = languageOnce ?? 'ja'
+    languageOnce = null
     const prompt = [
       `## 前回のサマリ\n${previous === null ? '（まだなし。最初のサマリを作ってください）' : JSON.stringify(previous)}`,
       `## その後のやり取り（${messages.length - from} 件）\n${digest(messages, from)}`,
+      `## 出力言語\n${language === 'en' ? 'English (translate every field, including unchanged ones)' : '日本語（変更のない項目もすべて日本語で）'}`,
     ].join('\n\n')
 
     const reply = await $.model.complete({
@@ -238,8 +242,8 @@ export const register: Register = (on, options) => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
       name: 'progress',
-      description: 'Refresh the progress summary now; `links` lists every url of the conversation',
-      argumentHint: '[links]',
+      description: 'Refresh the progress summary now; `en`/`ja` picks the language for this refresh; `links` lists every url',
+      argumentHint: '[en | ja | links]',
     })
     await ensureArmed($)
     if (view === 'pane') void $.ui.open({ id: PANE, title: PANE_TITLE })
@@ -248,7 +252,16 @@ export const register: Register = (on, options) => {
 
   on('command.run', { command: 'progress' }, async ($, e) => {
     await ensureArmed($)
-    if (e.args.trim() === 'links') {
+    const arg = e.args.trim()
+    if (arg === 'en' || arg === 'ja') {
+      languageOnce = arg
+      await update($, cursor, c => Math.max(0, c - 1)) // re-summarise even with nothing new
+      await update($, isHidden, () => false)
+      if (view === 'pane') await $.ui.open({ id: PANE, title: PANE_TITLE })
+      await refresh($)
+      return { text: `Progress summary refreshed in ${arg === 'en' ? 'English' : 'Japanese'} (this once).` }
+    }
+    if (arg === 'links') {
       const found = linksIn(await $.session.messages())
       await update($, links, () => found)
       return { text: found.length === 0 ? 'No links in this conversation yet.' : found.map(l => l.url).join('\n') }
